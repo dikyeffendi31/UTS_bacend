@@ -16,7 +16,7 @@ async function getUsers(request, response, next) {
     return next(error);
   }
 }
-
+/*test
 /**
  * Handle get user detail request
  * @param {object} request - Express request object
