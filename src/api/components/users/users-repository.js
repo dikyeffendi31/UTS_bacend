@@ -4,8 +4,35 @@ const { User } = require('../../../models');
  * Get a list of users
  * @returns {Promise}
  */
-async function getUsers() {
-  return User.find({});
+async function getUsers(
+  pageNumber = 1,
+  pageSize = 10,
+  searchKey = '',
+  sortField = 'email',
+  sortOrder = 'asc'
+) {
+  const skip = (pageNumber - 1) * pageSize;
+  let query = {};
+
+  // Buat query untuk pencarian
+  if (searchKey) {
+    query = {
+      $or: [
+        { name: { $regex: searchKey, $options: 'i' } }, // i adalah case-insensitive
+        { email: { $regex: searchKey, $options: 'i' } },
+      ],
+    };
+  }
+
+  // Lakukan pengurutan data
+  const sortOption = {};
+  sortOption[sortField] = sortOrder === 'asc' ? 1 : -1;
+
+  return User.find(query).sort(sortOption).skip(skip).limit(pageSize);
+}
+
+async function getTotalCount() {
+  return User.countDocuments();
 }
 
 /**
@@ -84,6 +111,7 @@ async function changePassword(id, password) {
 module.exports = {
   getUsers,
   getUser,
+  getTotalCount,
   createUser,
   updateUser,
   deleteUser,

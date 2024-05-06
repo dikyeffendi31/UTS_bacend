@@ -5,20 +5,36 @@ const { hashPassword, passwordMatched } = require('../../../utils/password');
  * Get list of users
  * @returns {Array}
  */
-async function getUsers() {
-  const users = await usersRepository.getUsers();
+async function getUsers(
+  pageNumber = 1,
+  pageSize = 10,
+  searchKey = '',
+  sortField = 'email',
+  sortOrder = 'asc'
+) {
+  const users = await usersRepository.getUsers(
+    pageNumber,
+    pageSize,
+    searchKey,
+    sortField,
+    sortOrder
+  );
 
-  const results = [];
-  for (let i = 0; i < users.length; i += 1) {
-    const user = users[i];
-    results.push({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    });
-  }
+  // Hitung total count users
+  const totalCount = await usersRepository.getTotalCount();
 
-  return results;
+  // Hitung total halaman
+  const totalPages = Math.ceil(totalCount / pageSize);
+
+  return {
+    page_number: pageNumber,
+    page_size: pageSize,
+    count: users.length,
+    total_pages: totalPages,
+    has_previous_page: pageNumber > 1,
+    has_next_page: pageNumber < totalPages,
+    data: users,
+  };
 }
 
 /**

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const config = require('../core/config');
 const logger = require('../core/logger')('app');
+const ProductSchema = require('./product.model');
 
 const usersSchema = require('./users-schema');
 
@@ -14,8 +15,10 @@ db.once('open', () => {
 });
 
 const User = mongoose.model('users', mongoose.Schema(usersSchema));
+const Product = mongoose.model('products', mongoose.Schema(ProductSchema));
 
 module.exports = {
   mongoose,
   User,
+  Product,
 };

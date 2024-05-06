@@ -10,12 +10,30 @@ const { errorResponder, errorTypes } = require('../../../core/errors');
  */
 async function getUsers(request, response, next) {
   try {
-    const users = await usersService.getUsers();
+    const pageNumber = parseInt(request.query.page_number) || 1;
+    const pageSize = parseInt(request.query.page_size) || 10;
+    const searchKey = request.query.search || '';
+    const sortField = request.query.sort
+      ? request.query.sort.split(':')[0]
+      : 'email';
+    const sortOrder = request.query.sort
+      ? request.query.sort.split(':')[1] || 'asc'
+      : 'asc';
+
+    const users = await usersService.getUsers(
+      pageNumber,
+      pageSize,
+      searchKey,
+      sortField,
+      sortOrder
+    );
+
     return response.status(200).json(users);
   } catch (error) {
     return next(error);
   }
 }
+
 /*test
 /**
  * Handle get user detail request
